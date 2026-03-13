@@ -197,6 +197,9 @@
         .meta-row { background: rgba(234, 179, 8, 0.15); color: #fde047; font-size: 0.8rem; font-weight: 600; }
         .meta-row td { border-bottom: 2px solid rgba(234, 179, 8, 0.3); }
 
+        .risk-row { background: rgba(239, 68, 68, 0.1); color: #fca5a5; font-size: 0.8rem; font-weight: 600; }
+        .risk-row td { border-bottom: 1px solid rgba(239, 68, 68, 0.2); }
+
         .clock-container {
             font-size: 0.9rem;
             color: var(--text-muted);
@@ -626,6 +629,14 @@ function calculateDhont(parties, deptoCode) {
         return `<td>${missing > 0 ? '+ ' + formatNum(missing) : '---'}</td>`;
     }).join('');
 
+    // Calcular cuántos votos puede PERDER un partido antes de perder su ÚLTIMA curul
+    const riskVotesRow = parties.map((p, pIdx) => {
+        if (escanos[pIdx] === 0) return `<td>---</td>`;
+        // El margen es: votos actuales - (cifra repartidora * numero de curules)
+        const margin = Math.floor(p.votes - (cifraRepartidora * escanos[pIdx]));
+        return `<td>${margin > 0 ? '- ' + formatNum(margin) : 'En riesgo'}</td>`;
+    }).join('');
+
     let html = `
         <thead>
             <tr>
@@ -641,6 +652,10 @@ function calculateDhont(parties, deptoCode) {
             <tr class="votos-row">
                 <td>Votos</td>
                 ${parties.map(p => `<td>${formatNum(p.votes)}</td>`).join('')}
+            </tr>
+            <tr class="risk-row">
+                <td>Riesgo de -1</td>
+                ${riskVotesRow}
             </tr>
             <tr class="escanos-row">
                 <td>Escaños</td>
