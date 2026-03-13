@@ -17,7 +17,7 @@
   {
     "id": "0",
     "name": "",
-    "votes": 9250
+    "votes": 14969
   },
   {
     "id": "6220",
@@ -42,12 +42,12 @@
   {
     "id": "3098",
     "name": "FUERZA POR EL HUILA",
-    "votes": 4194
+    "votes": 5014
   },
   {
     "id": "6167",
     "name": "CONSEJO COMUNITARIO DE COMUNIDADES NEGRAS CUENCA RÍO OVEJAS",
-    "votes": 0
+    "votes": 102
   },
   {
     "id": "6050",
@@ -182,7 +182,7 @@
   {
     "id": "3110",
     "name": "ALMA",
-    "votes": 2159
+    "votes": 3448
   },
   {
     "id": "6016",
@@ -310,14 +310,14 @@
     "votes": 0
   },
   {
-    "id": "1",
-    "name": "PARTIDO LIBERAL COLOMBIANO",
-    "votes": 114255
-  },
-  {
     "id": "6221",
     "name": "CONSEJO LABORAL AFROCOLOMBIANO CLAF - BOGOTÁ",
     "votes": 0
+  },
+  {
+    "id": "1",
+    "name": "PARTIDO LIBERAL COLOMBIANO",
+    "votes": 114255
   },
   {
     "id": "6181",

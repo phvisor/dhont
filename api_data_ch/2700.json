@@ -62,7 +62,7 @@
   {
     "id": "3125",
     "name": "AVANZA",
-    "votes": 33646
+    "votes": 35780
   },
   {
     "id": "6154",
@@ -82,7 +82,7 @@
   {
     "id": "1",
     "name": "PARTIDO LIBERAL COLOMBIANO",
-    "votes": 131368
+    "votes": 134083
   },
   {
     "id": "25",
@@ -167,7 +167,7 @@
   {
     "id": "3138",
     "name": "COALICIÓN FUERZA CIUDADANA",
-    "votes": 3826
+    "votes": 5858
   },
   {
     "id": "6222",
@@ -177,7 +177,7 @@
   {
     "id": "2",
     "name": "PARTIDO CONSERVADOR COLOMBIANO",
-    "votes": 102218
+    "votes": 102878
   },
   {
     "id": "6206",
@@ -232,12 +232,12 @@
   {
     "id": "3030",
     "name": "AHORA COLOMBIA",
-    "votes": 21117
+    "votes": 22271
   },
   {
     "id": "8",
     "name": "PARTIDO DE LA UNIÓN POR LA GENTE - PARTIDO DE LA U",
-    "votes": 136316
+    "votes": 138719
   },
   {
     "id": "6143",
@@ -272,7 +272,7 @@
   {
     "id": "0",
     "name": "",
-    "votes": 13091
+    "votes": 33649
   },
   {
     "id": "6220",
@@ -342,6 +342,6 @@
   {
     "id": "52",
     "name": "PARTIDO ECOLOGISTA COLOMBIANO",
-    "votes": 747
+    "votes": 1396
   }
 ]

@@ -12,52 +12,57 @@
   {
     "id": "1",
     "name": "PARTIDO LIBERAL COLOMBIANO",
-    "votes": 2047310
-  },
-  {
-    "id": "2",
-    "name": "PARTIDO CONSERVADOR COLOMBIANO",
-    "votes": 1631906
+    "votes": 2243354
   },
   {
     "id": "3020",
     "name": "ALIANZA POR COLOMBIA",
-    "votes": 1629034
+    "votes": 1869510
+  },
+  {
+    "id": "2",
+    "name": "PARTIDO CONSERVADOR COLOMBIANO",
+    "votes": 1835421
   },
   {
     "id": "8",
     "name": "PARTIDO DE LA UNIÓN POR LA GENTE - PARTIDO DE LA U",
-    "votes": 1388022
+    "votes": 1543576
   },
   {
     "id": "3003",
     "name": "COALICIÓN CAMBIO RADICAL - ALMA",
-    "votes": 1027217
+    "votes": 1231147
   },
   {
     "id": "3002",
     "name": "AHORA COLOMBIA",
-    "votes": 718759
-  },
-  {
-    "id": "0",
-    "name": "",
-    "votes": 541542
+    "votes": 862064
   },
   {
     "id": "20",
     "name": "MOVIMIENTO SALVACIÓN NACIONAL",
-    "votes": 531257
+    "votes": 662617
+  },
+  {
+    "id": "0",
+    "name": "",
+    "votes": 657858
   },
   {
     "id": "3018",
     "name": "FRENTE AMPLIO UNITARIO",
-    "votes": 267033
+    "votes": 385343
   },
   {
     "id": "1070",
     "name": "CREEMOS",
-    "votes": 185041
+    "votes": 208113
+  },
+  {
+    "id": "3143",
+    "name": "COALICIÓN FUERZA CIUDADANA",
+    "votes": 104003
   },
   {
     "id": "1079",
@@ -67,22 +72,17 @@
   {
     "id": "12",
     "name": "MOVIMIENTO ALTERNATIVO INDÍGENA Y SOCIAL \"MAIS\"",
-    "votes": 64788
+    "votes": 79091
   },
   {
     "id": "5",
     "name": "MOVIMIENTO AUTORIDADES INDÍGENAS DE COLOMBIA \"AICO\"",
-    "votes": 61524
-  },
-  {
-    "id": "3143",
-    "name": "COALICIÓN FUERZA CIUDADANA",
-    "votes": 46300
+    "votes": 65938
   },
   {
     "id": "6018",
     "name": "MOVIMIENTO UNIDAD EN MINGA POR COLOMBIA",
-    "votes": 45775
+    "votes": 48620
   },
   {
     "id": "21",
@@ -92,7 +92,7 @@
   {
     "id": "6156",
     "name": "ASOCIACIÓN DE AUTORIDADES TRADICIONALES INDÍGENAS",
-    "votes": 9535
+    "votes": 10225
   },
   {
     "id": "1008",
@@ -107,7 +107,7 @@
   {
     "id": "6175",
     "name": "MOVIMIENTO SI",
-    "votes": 646
+    "votes": 942
   },
   {
     "id": "6083",
