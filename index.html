@@ -190,6 +190,19 @@
 
         .meta-row { background: rgba(234, 179, 8, 0.15); color: #fde047; font-size: 0.8rem; font-weight: 600; }
         .meta-row td { border-bottom: 2px solid rgba(234, 179, 8, 0.3); }
+
+        .clock-container {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.7rem;
+            font-weight: 400;
+            background: rgba(59, 130, 246, 0.05);
+            display: inline-block;
+            padding: 0.5rem 1.2rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            backdrop-filter: blur(5px);
+        }
     </style>
 </head>
 <body>
@@ -197,7 +210,8 @@
 <div class="container">
     <header>
         <h1>Cámara de Representantes</h1>
-        <p style="color:var(--text-muted);">Simulador D'Hondt con Datos del API</p>
+        <p style="color:var(--text-muted); margin-bottom: 0.5rem;">Simulador D'Hondt con Datos del API</p>
+        <div id="clock" class="clock-container">Cargando fecha y hora...</div>
     </header>
 
     <div class="controls">
@@ -655,6 +669,38 @@ function updateStrategy(parties, escanos, cifraRepartidora) {
 
     document.getElementById('strategy-box').innerHTML = strategyHtml;
 }
+
+function updateClock() {
+    const now = new Date();
+    const options = { 
+        timeZone: 'America/Bogota', 
+        weekday: 'long',
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit',
+        hour12: true
+    };
+    
+    try {
+        const formatter = new Intl.DateTimeFormat('es-CO', options);
+        const parts = formatter.formatToParts(now);
+        const formatted = formatter.format(now);
+        
+        // Capitalizar primera letra (el día de la semana)
+        const capitalized = formatted.charAt(0).toUpperCase() + formatted.slice(1);
+        
+        document.getElementById('clock').innerHTML = `📅 ${capitalized} <span style="color:var(--accent-1); margin: 0 5px;">|</span> 🌎 Zona Horaria Colombia`;
+    } catch (e) {
+        document.getElementById('clock').innerText = now.toLocaleString();
+    }
+}
+
+// Iniciar reloj
+setInterval(updateClock, 1000);
+updateClock();
 
 fetchData();
 </script>
