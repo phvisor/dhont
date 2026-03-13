@@ -203,9 +203,100 @@
             border: 1px solid rgba(59, 130, 246, 0.2);
             backdrop-filter: blur(5px);
         }
+
+        /* Sistema de Login/Contraseña */
+        #auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 6, 23, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-1);
+            padding: 2.5rem;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.2);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .auth-card h2 {
+            margin: 0 0 1rem 0;
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .auth-card input {
+            width: 100%;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.6);
+            color: #fff;
+            text-align: center;
+            font-size: 1.2rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .auth-card input:focus {
+            border-color: var(--accent-1);
+        }
+
+        .auth-card button {
+            background: linear-gradient(to right, var(--accent-1), var(--accent-2));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .auth-card button:active {
+            transform: scale(0.98);
+        }
+
+        #auth-error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        body.locked {
+            overflow: hidden;
+            height: 100vh;
+        }
     </style>
 </head>
-<body>
+<body class="locked">
+
+<div id="auth-overlay">
+    <div class="auth-card">
+        <h2>Acceso Privado</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Ingrese su contraseña para ver el simulador estratégico del Pacto Histórico.</p>
+        <input type="password" id="pass-input" placeholder="Contraseña" onkeypress="if(event.key==='Enter') verifyPass()">
+        <button onclick="verifyPass()">Ingresar</button>
+        <div id="auth-error">Contraseña incorrecta. Intente de nuevo.</div>
+    </div>
+</div>
 
 <div class="container">
     <header>
@@ -702,7 +793,41 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-fetchData();
+// --- Lógica de Contraseña ---
+// La contraseña es: Pacto2026 (Hash SHA-256)
+const SECURE_HASH = "8e1582e0ded85a766cce06c88f2882aee0c131922c0692557ecbda1784ca3245";
+
+async function verifyPass() {
+    const input = document.getElementById('pass-input').value;
+    const msg = document.getElementById('auth-error');
+    
+    // Generar hash del input para comparar
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    if (hashHex === SECURE_HASH) {
+        document.getElementById('auth-overlay').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('auth-overlay').style.display = 'none';
+            document.body.classList.remove('locked');
+            sessionStorage.setItem('auth_pacto', 'true');
+        }, 500);
+        fetchData();
+    } else {
+        msg.style.display = 'block';
+        document.getElementById('pass-input').value = '';
+    }
+}
+
+// Persistencia en la sesión actual
+if (sessionStorage.getItem('auth_pacto') === 'true') {
+    document.getElementById('auth-overlay').style.display = 'none';
+    document.body.classList.remove('locked');
+    fetchData();
+}
 </script>
 </body>
 </html>
