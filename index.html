@@ -316,6 +316,7 @@
 
     <div class="controls">
         <select id="depto-select" onchange="fetchData()">
+            <option value="00">NACIONAL (SENADO)</option>
             <option value="60">AMAZONAS (60)</option>
             <option value="01">ANTIOQUIA (01)</option>
             <option value="40">ARAUCA (40)</option>
@@ -565,7 +566,9 @@ async function fetchData() {
         } else {
             document.getElementById('label-blancos').innerText = "Votos en Blanco + Nulos + No marcados";
             // Fuente Escrutinio (Snapshot de ClickHouse)
-            const url = `api_data_ch/${deptoCode}00.json`;
+            // Si es nacional (00), el archivo es 00.json, de lo contrario {depto}00.json
+            const filename = deptoCode === '00' ? "00.json" : `${deptoCode}00.json`;
+            const url = `api_data_ch/${filename}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error('Archivo de Escrutinio no encontrado. Ejecute el script de actualización.');
             const data = await response.json();
@@ -599,7 +602,8 @@ async function fetchData() {
 }
 
 function calculateDhont(parties, deptoCode) {
-    const numSeats = seatsMap[deptoCode] || 2;
+    // Si es nacional (00), son 108 curules de Senado, de lo contrario lo que diga el mapa
+    const numSeats = deptoCode === '00' ? 108 : (seatsMap[deptoCode] || 2);
     document.getElementById('total-curules').innerText = numSeats;
     
     const totalVotes = parties.reduce((sum, p) => sum + p.votes, 0);
