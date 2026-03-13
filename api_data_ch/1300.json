@@ -17,7 +17,7 @@
   {
     "id": "2",
     "name": "PARTIDO CONSERVADOR COLOMBIANO",
-    "votes": 119107
+    "votes": 118954
   },
   {
     "id": "6004",
@@ -42,7 +42,7 @@
   {
     "id": "6028",
     "name": "CONSEJO COMUNITARIO RÍO DE GUADUAS - CHIGORODÓ",
-    "votes": 0
+    "votes": 571
   },
   {
     "id": "6141",
@@ -52,7 +52,7 @@
   {
     "id": "3023",
     "name": "PR1MERO CÓRDOBA",
-    "votes": 334061
+    "votes": 333978
   },
   {
     "id": "50",
@@ -97,7 +97,7 @@
   {
     "id": "3060",
     "name": "PACTO HISTÓRICO CÓRDOBA",
-    "votes": 174442
+    "votes": 174422
   },
   {
     "id": "6253",
@@ -217,7 +217,7 @@
   {
     "id": "20",
     "name": "MOVIMIENTO SALVACIÓN NACIONAL",
-    "votes": 13056
+    "votes": 13054
   },
   {
     "id": "6131",
@@ -227,7 +227,7 @@
   {
     "id": "0",
     "name": "",
-    "votes": 88604
+    "votes": 22919
   },
   {
     "id": "6220",
@@ -297,7 +297,7 @@
   {
     "id": "11",
     "name": "PARTIDO CENTRO DEMOCRÁTICO",
-    "votes": 28372
+    "votes": 28369
   },
   {
     "id": "6235",
@@ -312,7 +312,7 @@
   {
     "id": "3",
     "name": "PARTIDO CAMBIO RADICAL",
-    "votes": 125531
+    "votes": 125523
   },
   {
     "id": "6164",
@@ -322,6 +322,6 @@
   {
     "id": "3131",
     "name": "ALMA",
-    "votes": 10843
+    "votes": 10839
   }
 ]

@@ -32,7 +32,7 @@
   {
     "id": "3048",
     "name": "CR-ASI-CJL",
-    "votes": 52122
+    "votes": 52121
   },
   {
     "id": "6150",
@@ -62,7 +62,7 @@
   {
     "id": "3125",
     "name": "AVANZA",
-    "votes": 35784
+    "votes": 35780
   },
   {
     "id": "6154",
@@ -82,7 +82,7 @@
   {
     "id": "1",
     "name": "PARTIDO LIBERAL COLOMBIANO",
-    "votes": 134087
+    "votes": 134083
   },
   {
     "id": "25",
@@ -107,7 +107,7 @@
   {
     "id": "3096",
     "name": "PACTO HISTÓRICO - SANTANDER",
-    "votes": 141161
+    "votes": 141149
   },
   {
     "id": "6230",
@@ -127,12 +127,12 @@
   {
     "id": "6109",
     "name": "CONSEJO COMUNITARIO EL NARANJO",
-    "votes": 4307
+    "votes": 4303
   },
   {
     "id": "3126",
     "name": "VERDE EN MARCHA",
-    "votes": 70575
+    "votes": 70571
   },
   {
     "id": "6173",
@@ -177,7 +177,7 @@
   {
     "id": "2",
     "name": "PARTIDO CONSERVADOR COLOMBIANO",
-    "votes": 102875
+    "votes": 102878
   },
   {
     "id": "6206",
@@ -217,7 +217,7 @@
   {
     "id": "11",
     "name": "PARTIDO CENTRO DEMOCRÁTICO",
-    "votes": 179743
+    "votes": 179720
   },
   {
     "id": "6191",
@@ -232,12 +232,12 @@
   {
     "id": "3030",
     "name": "AHORA COLOMBIA",
-    "votes": 22273
+    "votes": 22271
   },
   {
     "id": "8",
     "name": "PARTIDO DE LA UNIÓN POR LA GENTE - PARTIDO DE LA U",
-    "votes": 138730
+    "votes": 138719
   },
   {
     "id": "6143",
@@ -272,7 +272,7 @@
   {
     "id": "0",
     "name": "",
-    "votes": 77138
+    "votes": 33649
   },
   {
     "id": "6220",
@@ -342,6 +342,6 @@
   {
     "id": "52",
     "name": "PARTIDO ECOLOGISTA COLOMBIANO",
-    "votes": 1394
+    "votes": 1396
   }
 ]

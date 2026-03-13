@@ -2,7 +2,7 @@
   {
     "id": "6109",
     "name": "CONSEJO COMUNITARIO EL NARANJO",
-    "votes": 6357
+    "votes": 6336
   },
   {
     "id": "6173",
@@ -42,7 +42,7 @@
   {
     "id": "2",
     "name": "PARTIDO CONSERVADOR COLOMBIANO",
-    "votes": 74448
+    "votes": 74452
   },
   {
     "id": "6206",
@@ -107,12 +107,12 @@
   {
     "id": "1",
     "name": "PARTIDO LIBERAL COLOMBIANO",
-    "votes": 52979
+    "votes": 52962
   },
   {
     "id": "25",
     "name": "PARTIDO ECOLOGISTA COLOMBIANO",
-    "votes": 41442
+    "votes": 41427
   },
   {
     "id": "17",
@@ -177,7 +177,7 @@
   {
     "id": "6014",
     "name": "CONSEJO COMUNITARIO DE LA COMUNIDAD NEGRA DE LIMONES",
-    "votes": 1307
+    "votes": 1396
   },
   {
     "id": "12",
@@ -252,7 +252,7 @@
   {
     "id": "0",
     "name": "",
-    "votes": 59928
+    "votes": 20352
   },
   {
     "id": "6220",
@@ -267,12 +267,12 @@
   {
     "id": "3090",
     "name": "PARTIDO DE LA U - EN MARCHA",
-    "votes": 46971
+    "votes": 46952
   },
   {
     "id": "32",
     "name": "MOVIMIENTO POLÍTICO PACTO HISTÓRICO",
-    "votes": 158097
+    "votes": 158087
   },
   {
     "id": "6212",
@@ -332,6 +332,6 @@
   {
     "id": "3",
     "name": "PARTIDO CAMBIO RADICAL",
-    "votes": 18637
+    "votes": 18647
   }
 ]

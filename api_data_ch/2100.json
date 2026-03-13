@@ -42,7 +42,7 @@
   {
     "id": "2",
     "name": "PARTIDO CONSERVADOR COLOMBIANO",
-    "votes": 65760
+    "votes": 65414
   },
   {
     "id": "6004",
@@ -102,7 +102,7 @@
   {
     "id": "3087",
     "name": "PACTO HISTÓRICO MAGDALENA",
-    "votes": 88299
+    "votes": 88295
   },
   {
     "id": "6221",
@@ -112,7 +112,7 @@
   {
     "id": "1",
     "name": "PARTIDO LIBERAL COLOMBIANO",
-    "votes": 115796
+    "votes": 115784
   },
   {
     "id": "6126",
@@ -247,7 +247,7 @@
   {
     "id": "0",
     "name": "",
-    "votes": 51731
+    "votes": 11391
   },
   {
     "id": "6220",
@@ -277,7 +277,7 @@
   {
     "id": "11",
     "name": "PARTIDO CENTRO DEMOCRÁTICO",
-    "votes": 99317
+    "votes": 99302
   },
   {
     "id": "6191",
@@ -292,7 +292,7 @@
   {
     "id": "3034",
     "name": "\"SUMA\"",
-    "votes": 41198
+    "votes": 41184
   },
   {
     "id": "6164",
@@ -312,16 +312,16 @@
   {
     "id": "27",
     "name": "PARTIDO POLÍTICO ESPERANZA DEMOCRÁTICA",
-    "votes": 3569
+    "votes": 3565
   },
   {
     "id": "3074",
     "name": "COALICIÓN DEMÓCRATA AMPLIA POR LA PAZ",
-    "votes": 83535
+    "votes": 83514
   },
   {
     "id": "3139",
     "name": "COALICIÓN FUERZA CIUDADANA",
-    "votes": 50274
+    "votes": 50269
   }
 ]
