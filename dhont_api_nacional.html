@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repartición D'Hondt - Cámara de Representantes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-1: #3b82f6;
+            --accent-2: #8b5cf6;
+            --winner: rgba(16, 185, 129, 0.2);
+            --winner-border: #10b981;
+        }
+
+        body {
+            margin: 0;
+            padding: 2rem;
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, #020617 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        select {
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid var(--accent-1);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            padding: 0.8rem 2.5rem;
+            border-radius: 9999px;
+            outline: none;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .info-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-around;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat { text-align: center; }
+        .stat h3 { color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; margin:0;}
+        .stat p { font-size: 2rem; font-weight: 800; color: #fff; margin:0.5rem 0 0;}
+
+        .table-wrapper {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            overflow-x: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; }
+        th, td { padding: 1rem; text-align: center; border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); }
+        th { background: rgba(255, 255, 255, 0.05); font-weight: 600; font-size: 0.9rem; position: sticky; top: 0; }
+        th:first-child, td:first-child { position: sticky; left: 0; background: rgba(30, 41, 59, 1); z-index: 10; font-weight: 600; }
+
+        .votos-row { background: rgba(59, 130, 246, 0.1); color: #93c5fd; font-weight: bold; }
+        .escanos-row { background: rgba(139, 92, 246, 0.1); color: #d8b4fe; font-weight: bold; }
+        .winner-cell { background: var(--winner); border: 1px solid var(--winner-border); color: #34d399; font-weight: bold; }
+        .divisor-cell { color: var(--text-muted); }
+        
+        .loading { text-align: center; font-size: 1.5rem; padding: 2rem; }
+
+        .strategy-container {
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding-bottom: 5rem;
+        }
+
+        .strategy-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        
+        .strategy-card:hover { transform: translateY(-5px); border-color: var(--accent-1); }
+
+        .strategy-card h2 {
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .strategy-card .badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+
+        .strategy-main-val {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .strategy-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .alliance-list {
+            margin-top: 1rem;
+            list-style: none;
+            padding: 0;
+        }
+        
+        .alliance-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .meta-row { background: rgba(234, 179, 8, 0.15); color: #fde047; font-size: 0.8rem; font-weight: 600; }
+        .meta-row td { border-bottom: 2px solid rgba(234, 179, 8, 0.3); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Cámara de Representantes</h1>
+        <p style="color:var(--text-muted);">Simulador D'Hondt con Datos del API</p>
+    </header>
+
+    <div class="controls">
+        <select id="depto-select" onchange="fetchData()">
+            <option value="60">AMAZONAS (60)</option>
+            <option value="01">ANTIOQUIA (01)</option>
+            <option value="40">ARAUCA (40)</option>
+            <option value="03">ATLANTICO (03)</option>
+            <option value="16">BOGOTA D.C. (16)</option>
+            <option value="05">BOLIVAR (05)</option>
+            <option value="07">BOYACA (07)</option>
+            <option value="09">CALDAS (09)</option>
+            <option value="44">CAQUETA (44)</option>
+            <option value="46">CASANARE (46)</option>
+            <option value="11">CAUCA (11)</option>
+            <option value="12">CESAR (12)</option>
+            <option value="17">CHOCO (17)</option>
+            <option value="13">CORDOBA (13)</option>
+            <option value="15">CUNDINAMARCA (15)</option>
+            <option value="50">GUAINIA (50)</option>
+            <option value="54">GUAVIARE (54)</option>
+            <option value="19">HUILA (19)</option>
+            <option value="48">LA GUAJIRA (48)</option>
+            <option value="21">MAGDALENA (21)</option>
+            <option value="52">META (52)</option>
+            <option value="23">NARIÑO (23)</option>
+            <option value="25">NORTE DE SANTANDER (25)</option>
+            <option value="64">PUTUMAYO (64)</option>
+            <option value="26">QUINDIO (26)</option>
+            <option value="24">RISARALDA (24)</option>
+            <option value="56">SAN ANDRES (56)</option>
+            <option value="27">SANTANDER (27)</option>
+            <option value="28">SUCRE (28)</option>
+            <option value="29">TOLIMA (29)</option>
+            <option value="31">VALLE (31)</option>
+            <option value="68">VAUPES (68)</option>
+            <option value="72">VICHADA (72)</option>
+        </select>
+    </div>
+
+    <div class="info-panel">
+        <div class="stat"><h3>Curules</h3><p id="total-curules">0</p></div>
+        <div class="stat"><h3>Votos Válidos</h3><p id="votos-validos">0</p></div>
+        <div class="stat"><h3>Votos en Blanco</h3><p id="votos-blancos">0</p></div>
+        <div class="stat"><h3>Cifra Repartidora</h3><p id="cifra-repartidora">0</p></div>
+    </div>
+
+    <div id="content" class="table-wrapper">
+        <table id="dhont-table"></table>
+    </div>
+
+    <div id="strategy-box" class="strategy-container"></div>
+</div>
+
+<script>
+const partyNames = {
+    "2": "PARTIDO LIBERAL COLOMBIANO",
+    "3": "PARTIDO CONSERVADOR COLOMBIANO",
+    "4": "PARTIDO CAMBIO RADICAL",
+    "5": "PARTIDO ALIANZA VERDE",
+    "6": "MOVIMIENTO AUTORIDADES INDÍGENAS DE COLOMBIA AICO",
+    "7": "PARTIDO ALIANZA SOCIAL INDEPENDIENTE ASI",
+    "8": "PARTIDO POLÍTICO MIRA",
+    "9": "PARTIDO DE LA UNIÓN POR LA GENTE - PARTIDO DE LA U",
+    "10": "PARTIDO CENTRO DEMOCRÁTICO",
+    "12": "PARTIDO COLOMBIA JUSTA LIBRES",
+    "13": "PARTIDO COLOMBIA RENACIENTE",
+    "14": "MOVIMIENTO ALIANZA DEMOCRÁTICA AMPLIA (ADA)",
+    "15": "PARTIDO POLÍTICO DIGNIDAD & COMPROMISO",
+    "16": "PARTIDO NUEVO LIBERALISMO",
+    "17": "MOVIMIENTO SALVACIÓN NACIONAL",
+    "18": "PARTIDO POLÍTICO OXÍGENO",
+    "19": "PARTIDO LIGA GOBERNANTES ANTICORRUPCIÓN",
+    "20": "PARTIDO DEMÓCRATA COLOMBIANO",
+    "22": "PARTIDO POLÍTICO LA FUERZA",
+    "23": "PARTIDO POLÍTICO ESPERANZA DEMOCRÁTICA",
+    "24": "PARTIDO DEL TRABAJO DE COLOMBIA",
+    "25": "PARTIDO EN MARCHA",
+    "26": "MOVIMIENTO POLÍTICO PACTO HISTÓRICO",
+    "28": "MOVIMIENTO ALTERNATIVO INDÍGENA Y SOCIAL MAIS",
+    "29": "PARTIDO ECOLOGISTA COLOMBIANO",
+    "35": "LA LISTA DE OVIEDO - CON TODA POR BOGOTÁ",
+    "36": "MOVIMIENTO AGRARIO COLOMBIANO",
+    "38": "CREEMOS",
+    "41": "CENTRO DEMOCRÁTICO-MIRA",
+    "42": "REVIVE CAQUETÁ 2.0",
+    "45": "PARTIDO DE LA U, MIRA, SALVACIÓN NACIONAL, ADA",
+    "46": "CENTRO DEMOCRÁTICO- MIRA",
+    "48": "MIRA + DIGNIDAD Y COMPROMISO",
+    "49": "MIRA + DIGNIDAD Y COMPROMISO",
+    "51": "MIRA + DIGNIDAD Y COMPROMISO",
+    "52": "AHORA COLOMBIA",
+    "53": "LA VOZ DEL AMAZONAS",
+    "54": "ALIANZA POR NARIÑO",
+    "56": "PUTUMAYO NOS UNE",
+    "58": "CENTRO DEMOCRÁTICO - MIRA",
+    "59": "PR1MERO CÓRDOBA",
+    "60": "MIRA + DIGNIDAD Y COMPROMISO",
+    "61": "AHORA COLOMBIA",
+    "62": "AHORA COLOMBIA",
+    "63": "AHORA COLOMBIA",
+    "64": "AHORA COLOMBIA",
+    "65": "AHORA COLOMBIA",
+    "67": "SUMA",
+    "68": "AHORA COLOMBIA",
+    "69": "FUERZA TOLIMA",
+    "70": "PARTIDO DE LA U - CAMBIO RADICAL",
+    "71": "AVANCEMOS NARIÑO",
+    "72": "PARTIDO DE LA U, MIRA, NUEVO LIBERALISMO",
+    "73": "ALMA",
+    "74": "AHORA COLOMBIA",
+    "75": "AHORA COLOMBIA",
+    "76": "NUESTRA FUERZA",
+    "77": "CR-ASI-CJL",
+    "78": "CR-LAU-MSN-OXI",
+    "79": "CR-CJL-LIGA DE GOBERNANTES",
+    "80": "COALICIONAL LIBERAL - COLOMBIA RENACIENTE",
+    "81": "PACTO HISTÓRICO BOLÍVAR",
+    "82": "AHORA COLOMBIA CALDAS",
+    "83": "PACTO HISTÓRICO NORTE DE SANTANDER",
+    "84": "PACTO HISTÓRICO ANTIOQUIA",
+    "85": "MOVIMIENTO POLÍTICO PACTO HISTÓRICO",
+    "86": "MOVIMIENTO POLÍTICO PACTO HISTÓRICO",
+    "87": "PACTO HISTÓRICO BOYACÁ",
+    "88": "PACTO HISTÓRICO VAUPÉS",
+    "89": "PACTO HISTÓRICO CÓRDOBA",
+    "90": "PACTO HISTÓRICO ATLÁNTICO",
+    "91": "MOVIMIENTO POLÍTICO PACTO HISTÓRICO",
+    "93": "MOVIMIENTO POLÍTICO PACTO HISTÓRICO",
+    "94": "FUERZA CAUCA",
+    "95": "CIUDADANOS RENOVEMOS",
+    "96": "PACTO HISTÓRICO HUILA",
+    "97": "ALMA",
+    "98": "CENTRO DEMOCRÁTICO- NUEVO LIBERALISMO-MIRA",
+    "99": "COALICIÓN CAQUETÁ",
+    "100": "PACTO VERDE POR EL TOLIMA",
+    "101": "PACTO HISTÓRICO CHOCÓ",
+    "102": "PACTO HISTÓRICO GUAINIA",
+    "103": "COALICIÓN DEMÓCRATA AMPLIA POR LA PAZ",
+    "104": "PACTO HISTÓRICO CESAR",
+    "105": "MIRA + DIGNIDAD Y COMPROMISO",
+    "106": "CENTRO DEMOCRÁTICO- PARTIDO DE LA U",
+    "107": "SALVACIÓN+ALMA+OXÍGENO",
+    "108": "ALMA - CAMBIO RADICAL",
+    "109": "PACTO HISTÓRICO GUAJIRA",
+    "110": "POR RISARALDA",
+    "111": "ESPERANZA CHOCÓ",
+    "112": "PACTO HISTÓRICO ALIANZA VERDE",
+    "113": "PACTO HISTÓRICO - FRENTE AMPLIO",
+    "114": "ABC ALIANZA BOGOTÁ CONVERGENTE",
+    "115": "PACTO HISTÓRICO MAGDALENA",
+    "116": "PACTO HISTÓRICO AMAZONAS",
+    "117": "PACTO HISTÓRICO CAQUETÁ",
+    "118": "PARTIDO DE LA U - EN MARCHA",
+    "119": "COALICIÓN ALIANZA VERDE, EN MARCHA, ASI",
+    "120": "PARTIDO DE LA U - PARTIDO MIRA",
+    "121": "PARTIDO CONSERVADOR - MOVIMIENTO SALVACIÓN NACIONAL",
+    "122": "CR-NUEVO LIBERALISMO",
+    "123": "BOGOTÁ ENTRE TODOS",
+    "124": "PACTO HISTÓRICO - SANTANDER",
+    "125": "CENTRO DEMOCRÁTICO - PARTIDO CONSERVADOR",
+    "126": "FUERZA POR EL HUILA",
+    "127": "PACTO VERDE PUTUMAYO",
+    "128": "PACTO HISTÓRICO - CASANARE",
+    "129": "ALMA CASANARE",
+    "130": "PACTO HISTÓRICO QUINDÍO",
+    "131": "PUTUMAYO TAMBIÉN ES COLOMBIA",
+    "132": "PARTIDO DE LA U - PARTIDO ECOLOGISTA COLOMBIANO",
+    "133": "PACTO FRENTE AMPLIO",
+    "134": "ALMA ATLÁNTICO",
+    "135": "PACTO - VERDE - GUAVIARE",
+    "136": "MIRA + DIGNIDAD & COMPROMISO + PARTIDO DEMÓCRATA",
+    "137": "ALMA - OXÍGENO",
+    "138": "ALMA",
+    "139": "PACTO HISTÓRICO SUCRE UNITARIOS",
+    "140": "PACTO HISTÓRICO UNITARIO - VICHADA",
+    "141": "FRENTE AMPLIO UNITARIO",
+    "142": "PACTO POR RISARALDA",
+    "143": "FRENTE AMPLIO UNITARIO",
+    "144": "PACTO HISTÓRICO SAN ANDRÉS",
+    "145": "FRENTE AMPLIO UNITARIO CALDAS",
+    "146": "FRENTE AMPLIO UNITARIO",
+    "147": "ALIANZA POR CASANARE",
+    "149": "MOTOCICLISTAS Y CONDUCTORES UNIDOS POR LA CAUSA",
+    "150": "FRENTE AMPLIO UNITARIO",
+    "151": "FRENTE AMPLIO RISARALDA",
+    "152": "AVANZA",
+    "153": "VERDE EN MARCHA",
+    "154": "COALICIÓN ALIANZA VERDE - ASI - U - PTC",
+    "155": "COALICIÓN VERDE - EN MARCHA- LA FUERZA",
+    "156": "COALICIÓN VERDE - EN MARCHA- LA FUERZA",
+    "158": "ALMA",
+    "159": "FRENTE AMPLIO UNITARIO",
+    "160": "COALICIÓN FUERZA CIUDADANA",
+    "161": "COALICIÓN FUERZA CIUDADANA",
+    "162": "COALICIÓN FUERZA CIUDADANA",
+    "163": "COALICIÓN ALIANZA CÓRDOBA",
+    "164": "COALICIÓN FUERZA CIUDADANA",
+    "165": "COALICIÓN FUERZA CIUDADANA",
+    "166": "COALICIÓN FUERZA CIUDADANA",
+    "167": "COALICIÓN FUERZA CIUDADANA",
+    "168": "COALICIÓN FUERZA CIUDADANA",
+    "169": "COALICIÓN FUERZA CIUDADANA",
+    "172": "COALICIÓN FUERZA CIUDADANA"
+};
+
+const seatsMap = {
+    "01": 17, "03": 7, "05": 6, "07": 6, "09": 5, "11": 4, "12": 4, "13": 5, "15": 7, "16": 18,
+    "17": 2, "19": 4, "21": 5, "23": 5, "24": 4, "25": 5, "26": 3, "27": 7, "28": 3, "29": 6,
+    "31": 13, "40": 2, "44": 2, "46": 2, "48": 2, "50": 2, "52": 3, "54": 2, "56": 2, "60": 2,
+    "64": 2, "68": 2, "72": 2
+};
+
+const pactoIds = ["26", "38", "81", "83", "84", "85", "86", "87", "88", "89", "90", "91", "93", "96", "101", "102", "104", "109", "112", "113", "115", "116", "117", "124", "128", "130", "133", "135", "139", "140", "142", "144"];
+
+function formatNum(num) { return Math.floor(num).toLocaleString('es-CO'); }
+
+async function fetchData() {
+    const deptoCode = document.getElementById('depto-select').value;
+    // Ahora apuntamos a la carpeta local donde descargamos los datos
+    const url = `api_data/${deptoCode}00.json`;
+    
+    document.getElementById('content').innerHTML = '<div class="loading">Cargando datos locales...</div>';
+    
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Archivo no encontrado');
+        const data = await response.json();
+        
+        // Votos en Blanco
+        const blankVotes = data.camaras && data.camaras[0] ? parseInt(data.camaras[0].totales.act.votbla || 0) : 0;
+        document.getElementById('votos-blancos').innerText = formatNum(blankVotes);
+
+        // El API para departamentos específicos suele traer los datos en camaras[0]
+        const camara = data.camaras[0];
+        const partiesRaw = camara.partotabla;
+        
+        // Mostrar [ID] Nombre del partido usando el mapeo cargado
+        const parties = partiesRaw.map(p => {
+            const id = p.act.codpar;
+            const name = partyNames[id] || p.act.nompar || "---";
+            return {
+                id: id, 
+                name: `[${id}] ${name}`,
+                votes: parseInt(p.act.vot)
+            };
+        }).sort((a,b) => b.votes - a.votes); // Mostrar todos los partidos
+
+        calculateDhont(parties, deptoCode);
+    } catch (e) {
+        document.getElementById('content').innerHTML = `<div class="loading" style="color:#ef4444">Error cargando datos del API. Puede ser por CORS o conexión.</div>`;
+    }
+}
+
+function calculateDhont(parties, deptoCode) {
+    const numSeats = seatsMap[deptoCode] || 2;
+    document.getElementById('total-curules').innerText = numSeats;
+    
+    const totalVotes = parties.reduce((sum, p) => sum + p.votes, 0);
+    document.getElementById('votos-validos').innerText = formatNum(totalVotes);
+
+    let quotients = [];
+    parties.forEach((p, pIdx) => {
+        for(let div = 1; div <= numSeats; div++) {
+            quotients.push({ partyIdx: pIdx, divisor: div, value: p.votes / div });
+        }
+    });
+
+    quotients.sort((a, b) => b.value - a.value);
+    const winners = quotients.slice(0, numSeats);
+    const cifraRepartidora = winners[winners.length - 1].value;
+    document.getElementById('cifra-repartidora').innerText = formatNum(cifraRepartidora);
+
+    let escanos = new Array(parties.length).fill(0);
+    winners.forEach(w => escanos[w.partyIdx]++);
+    let winnerSet = new Set(winners.map(w => `${w.divisor}-${w.partyIdx}`));
+
+    // Calcular cuántos votos le faltan a cada partido para su SIGUIENTE curul
+    const missingVotesRow = parties.map((p, pIdx) => {
+        const nextSeat = escanos[pIdx] + 1;
+        const votesNeeded = Math.ceil(cifraRepartidora * nextSeat + 1);
+        const missing = Math.max(0, votesNeeded - p.votes);
+        return `<td>${missing > 0 ? '+ ' + formatNum(missing) : '---'}</td>`;
+    }).join('');
+
+    let html = `
+        <thead>
+            <tr>
+                <th>Divisor</th>
+                ${parties.map(p => `<th>${p.name}</th>`).join('')}
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="meta-row">
+                <td>Faltan para +1</td>
+                ${missingVotesRow}
+            </tr>
+            <tr class="votos-row">
+                <td>Votos</td>
+                ${parties.map(p => `<td>${formatNum(p.votes)}</td>`).join('')}
+            </tr>
+            <tr class="escanos-row">
+                <td>Escaños</td>
+                ${escanos.map(e => `<td>${e}</td>`).join('')}
+            </tr>
+    `;
+
+    for(let div = 1; div <= Math.max(5, numSeats); div++) {
+        html += `<tr><td class="divisor-cell">÷ ${div}</td>`;
+        parties.forEach((p, pIdx) => {
+            let val = p.votes / div;
+            let isWinner = winnerSet.has(`${div}-${pIdx}`);
+            html += `<td class="${isWinner ? 'winner-cell' : ''}">${formatNum(val)}</td>`;
+        });
+        html += `</tr>`;
+    }
+    html += '</tbody>';
+    document.getElementById('content').innerHTML = '<table id="dhont-table">' + html + '</table>';
+
+    // Seccion de Estrategia para el Pacto Historico
+    updateStrategy(parties, escanos, cifraRepartidora);
+}
+
+function updateStrategy(parties, escanos, cifraRepartidora) {
+    const totalVotesDepto = parties.reduce((s, p) => s + p.votes, 0);
+    const numSeats = parseInt(document.getElementById('total-curules').innerText);
+    const quotient = totalVotesDepto / numSeats;
+    const threshold = quotient * 0.5; // Umbral = 50% del Cociente Electoral
+
+    const pactoParties = parties.filter(p => pactoIds.includes(p.id));
+    
+    if (pactoParties.length === 0) {
+        document.getElementById('strategy-box').innerHTML = `
+            <div class="strategy-card">
+                <h2>ESTRAGEDIA PACTO <span class="badge badge-warning">Ausente</span></h2>
+                <p class="strategy-desc">No se detectó ninguna lista del Pacto Histórico en este departamento para el cálculo estratégico.</p>
+            </div>`;
+        return;
+    }
+
+    const totalVotesPacto = pactoParties.reduce((s, p) => s + p.votes, 0);
+    const totalSeatsPacto = pactoParties.map(p => {
+        const idx = parties.findIndex(orig => orig.id === p.id);
+        return escanos[idx];
+    }).reduce((s, count) => s + count, 0);
+
+    // 1. ANALISIS DE LA PROXIMA CURUL
+    const nextSeatCost = Math.ceil(cifraRepartidora * (totalSeatsPacto + 1) + 1);
+    const missingForNext = Math.max(0, nextSeatCost - totalVotesPacto);
+
+    // 2. ANALISIS DE RIESGO DE UMBRAL
+    const thresholdProgress = (totalVotesPacto / threshold) * 100;
+    const missingForThreshold = Math.max(0, Math.ceil(threshold - totalVotesPacto));
+    let thresholdStatus = { label: "Seguro", class: "badge-success" };
+    if (thresholdProgress < 100) thresholdStatus = { label: "BAJO UMBRAL", class: "badge-danger" };
+    else if (thresholdProgress < 120) thresholdStatus = { label: "RIESGO LÍMITE", class: "badge-warning" };
+
+    // 3. ANALISIS DE "ALIADOS POTENCIALES" (Partidos sin curules que sumarian)
+    const potentialAllies = parties
+        .filter(p => !pactoIds.includes(p.id) && escanos[parties.indexOf(p)] === 0 && p.votes > 1000)
+        .slice(0, 3); // Top 3 partidos pequeños
+    
+    // 4. SOLIDEZ DE LA ÚLTIMA CURUL
+    // Cual es el cociente del pacto por su ULTIMA curul ganada vs la cifra repartidora?
+    const lastSeatQuotient = totalSeatsPacto > 0 ? totalVotesPacto / totalSeatsPacto : 0;
+    const safetyMargin = lastSeatQuotient - cifraRepartidora;
+
+    let strategyHtml = `
+        <!-- Card 1: Próxima Curul -->
+        <div class="strategy-card" style="border-top: 4px solid #facc15;">
+            <h2>OBJETIVO: CURUL ${totalSeatsPacto + 1} <span class="badge badge-warning">+1 SILLA</span></h2>
+            <div class="strategy-main-val">+ ${formatNum(missingForNext)}</div>
+            <p class="strategy-desc">Votos adicionales necesarios para superar la cifra repartidora y ganar una curul extra.</p>
+        </div>
+
+        <!-- Card 2: Riesgo de Umbral -->
+        <div class="strategy-card" style="border-top: 4px solid ${thresholdProgress < 100 ? '#ef4444' : '#10b981'};">
+            <h2>ESTADO DEL UMBRAL <span class="badge ${thresholdStatus.class}">${thresholdStatus.label}</span></h2>
+            <div class="strategy-main-val">${thresholdProgress.toFixed(1)}%</div>
+            <p class="strategy-desc">
+                ${missingForThreshold > 0 
+                    ? `Faltan <b>${formatNum(missingForThreshold)}</b> votos para superar el umbral de <b>${formatNum(threshold)}</b>.` 
+                    : `Umbral superado por <b>${formatNum(totalVotesPacto - threshold)}</b> votos. Lista habilitada.`}
+            </p>
+        </div>
+
+        <!-- Card 3: Aliados Estratégicos -->
+        <div class="strategy-card">
+            <h2>ALIADOS POTENCIALES <span class="badge badge-success">Sinergia</span></h2>
+            <ul class="alliance-list">
+                ${potentialAllies.length > 0 
+                    ? potentialAllies.map(a => `
+                        <li class="alliance-item">
+                            <span>${a.name}</span>
+                            <span style="color:#60a5fa; font-weight:800;">${formatNum(a.votes)} v</span>
+                        </li>`).join('')
+                    : '<li class="strategy-desc">No se detectaron aliados viables sin curules.</li>'}
+            </ul>
+            <p class="strategy-desc" style="margin-top:auto; font-size:0.75rem;">Partidos sin curules cuyos votos podrían sumarse en una futura coalición.</p>
+        </div>
+
+        <!-- Card 4: Solidez Electoral -->
+        <div class="strategy-card">
+            <h2>SOLIDEZ DE ÚLTIMA CURUL <span class="badge ${safetyMargin < 2000 ? 'badge-warning' : 'badge-success'}">Seguridad</span></h2>
+            <div class="strategy-main-val">${totalSeatsPacto > 0 ? formatNum(safetyMargin) : '---'}</div>
+            <p class="strategy-desc">
+                ${totalSeatsPacto > 0 
+                    ? `Margen de seguridad sobre la cifra repartidora. Un margen bajo (< 2.000) indica riesgo de pérdida por recuento.`
+                    : `Sin curules ganadas aún en este departamento.`}
+            </p>
+        </div>
+    `;
+
+    document.getElementById('strategy-box').innerHTML = strategyHtml;
+}
+
+fetchData();
+</script>
+</body>
+</html>
