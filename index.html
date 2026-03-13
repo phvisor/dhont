@@ -446,11 +446,9 @@ async function fetchData() {
             const data = await response.json();
             
             parties = data.map(p => {
-                const id = p.id;
-                const name = partyNames[id] || p.name || "---";
                 return {
-                    id: id,
-                    name: `[${id}] ${name}`,
+                    id: p.id,
+                    name: p.name || "---",
                     votes: parseInt(p.votes)
                 };
             });
@@ -542,7 +540,17 @@ function updateStrategy(parties, escanos, cifraRepartidora) {
     const quotient = totalVotesDepto / numSeats;
     const threshold = quotient * 0.5; // Umbral = 50% del Cociente Electoral
 
-    const pactoParties = parties.filter(p => pactoIds.includes(p.id));
+    // Función inteligente para detectar si un partido es del Pacto
+    const isPacto = (p) => {
+        const name = (p.name || "").toUpperCase();
+        return pactoIds.includes(p.id) || 
+               name.includes("PACTO HISTORICO") || 
+               name.includes("PACTO HISTÓRICO") || 
+               name.includes("MOVIMIENTO POLÍTICO PACTO HISTÓRICO") ||
+               (name.includes("PACTO") && name.includes("UNITARIO"));
+    };
+
+    const pactoParties = parties.filter(isPacto);
     
     if (pactoParties.length === 0) {
         document.getElementById('strategy-box').innerHTML = `
