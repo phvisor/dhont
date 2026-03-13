@@ -114,6 +114,10 @@
         th:first-child, td:first-child { position: sticky; left: 0; background: rgba(30, 41, 59, 1); z-index: 10; font-weight: 600; }
 
         .votos-row { background: rgba(59, 130, 246, 0.1); color: #93c5fd; font-weight: bold; }
+        .trend-up { color: #10b981; font-size: 0.75rem; margin-top: 0.2rem; display: block; font-weight: normal; }
+        .trend-down { color: #ef4444; font-size: 0.75rem; margin-top: 0.2rem; display: block; font-weight: normal; }
+        .trend-neutral { color: var(--text-muted); font-size: 0.75rem; margin-top: 0.2rem; display: block; font-weight: normal; }
+        
         .escanos-row { background: rgba(139, 92, 246, 0.1); color: #d8b4fe; font-weight: bold; }
         .winner-cell { background: var(--winner); border: 1px solid var(--winner-border); color: #34d399; font-weight: bold; }
         .divisor-cell { color: var(--text-muted); }
@@ -565,28 +569,36 @@ async function fetchData() {
             });
         } else {
             document.getElementById('label-blancos').innerText = "Votos en Blanco + Nulos + No marcados";
-            // Fuente Escrutinio (Snapshot de ClickHouse)
-            // Si es nacional (00), el archivo es 00.json, de lo contrario {depto}00.json
             const filename = deptoCode === '00' ? "00.json" : `${deptoCode}00.json`;
-            const url = `api_data_ch/${filename}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Archivo de Escrutinio no encontrado. Ejecute el script de actualización.');
+            
+            // Cargar datos actuales
+            const response = await fetch(`api_data_ch/${filename}`);
+            if (!response.ok) throw new Error('Archivo de Escrutinio no encontrado.');
             const data = await response.json();
             
+            // INTENTAR CARGAR DATOS PREVIOS (Tendencia)
+            let prevData = null;
+            try {
+                const prevResponse = await fetch(`api_data_ch_prev/${filename}`);
+                if (prevResponse.ok) prevData = await prevResponse.json();
+            } catch(e) { console.log("Sin datos previos para comparar"); }
+
             const rawParties = data;
-            
-            // Buscar los votos tecnicos (ID "0") que son Blanco + Nulos + No Marcados
             const technicalVotesRecord = rawParties.find(p => p.id === "0");
             blankVotes = technicalVotesRecord ? parseInt(technicalVotesRecord.votes) : 0;
 
-            // Filtrar los partidos reales (excluyendo el ID "0")
             parties = rawParties
                 .filter(p => p.id !== "0")
                 .map(p => {
+                    // Buscar este mismo partido en los datos previos
+                    const prevParty = prevData ? prevData.find(old => old.id === p.id) : null;
+                    const diff = prevParty ? (parseInt(p.votes) - parseInt(prevParty.votes)) : 0;
+                    
                     return {
                         id: p.id,
                         name: p.name || "---",
-                        votes: parseInt(p.votes)
+                        votes: parseInt(p.votes),
+                        diff: diff
                     };
                 });
         }
@@ -655,7 +667,14 @@ function calculateDhont(parties, deptoCode) {
             </tr>
             <tr class="votos-row">
                 <td>Votos</td>
-                ${parties.map(p => `<td>${formatNum(p.votes)}</td>`).join('')}
+                ${parties.map(p => {
+                    let trendHtml = '';
+                    if (p.diff > 0) trendHtml = `<span class="trend-up">▲ +${formatNum(p.diff)}</span>`;
+                    else if (p.diff < 0) trendHtml = `<span class="trend-down">▼ ${formatNum(p.diff)}</span>`;
+                    else trendHtml = `<span class="trend-neutral">● Estable</span>`;
+                    
+                    return `<td>${formatNum(p.votes)}${trendHtml}</td>`;
+                }).join('')}
             </tr>
             <tr class="risk-row">
                 <td>Riesgo de -1</td>
