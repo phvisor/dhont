@@ -41,6 +41,7 @@
             font-size: 2.5rem;
             margin: 0;
             background: linear-gradient(to right, #60a5fa, #c084fc);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 800;
@@ -147,6 +148,11 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+
+        .strategy-card h2 span[style*="background: linear-gradient"] {
+            background-clip: text;
+            -webkit-background-clip: text;
         }
 
         .strategy-card .badge {
@@ -794,21 +800,15 @@ setInterval(updateClock, 1000);
 updateClock();
 
 // --- Lógica de Contraseña ---
-// La contraseña es: Pacto2026 (Hash SHA-256)
-const SECURE_HASH = "8e1582e0ded85a766cce06c88f2882aee0c131922c0692557ecbda1784ca3245";
+// Clave ofuscada en Base64
+const _kp = "UGFjdG8yMDI2"; 
 
-async function verifyPass() {
-    const input = document.getElementById('pass-input').value;
+function verifyPass() {
+    const input = document.getElementById('pass-input').value.trim();
     const msg = document.getElementById('auth-error');
     
-    // Generar hash del input para comparar
-    const encoder = new TextEncoder();
-    const data = encoder.encode(input);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-    if (hashHex === SECURE_HASH) {
+    // Validar comparando con el valor decodificado
+    if (input === atob(_kp)) {
         document.getElementById('auth-overlay').style.opacity = '0';
         setTimeout(() => {
             document.getElementById('auth-overlay').style.display = 'none';
