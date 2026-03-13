@@ -439,32 +439,14 @@ async function fetchData() {
                 };
             });
         } else {
-            // Fuente ClickHouse (Escrutinio)
-            const chUrl = 'http://66.94.100.48:8123/';
-            const query = `
-                SELECT 
-                    cod_partido, 
-                    any(nombre_partido) as name, 
-                    sum(votos_proyectados) as votes 
-                FROM supert.votos_partido_nacional 
-                WHERE cod_departamento = '${deptoCode}' AND corporacion = 'CAM' 
-                GROUP BY cod_partido 
-                ORDER BY votes DESC 
-                FORMAT JSON`;
+            // Fuente Escrutinio (Snapshot de ClickHouse)
+            const url = `api_data_ch/${deptoCode}00.json`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Archivo de Escrutinio no encontrado. Ejecute el script de actualización.');
+            const data = await response.json();
             
-            const response = await fetch(chUrl, {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Basic ' + btoa('admin:QaJZh6UUhTTNZAYB')
-                },
-                body: query
-            });
-
-            if (!response.ok) throw new Error('Error en ClickHouse');
-            const result = await response.json();
-            
-            parties = result.data.map(p => {
-                const id = parseInt(p.cod_partido).toString(); // Normalizar ID
+            parties = data.map(p => {
+                const id = p.id;
                 const name = partyNames[id] || p.name || "---";
                 return {
                     id: id,
@@ -472,7 +454,7 @@ async function fetchData() {
                     votes: parseInt(p.votes)
                 };
             });
-            blankVotes = 0; // Mesa de escrutinio no suele tener el dato de blanco separado en esta tabla
+            blankVotes = 0; // El escrutinio proyectado no suele incluir blancos en esta tabla
         }
 
         document.getElementById('votos-blancos').innerText = formatNum(blankVotes);
