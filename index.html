@@ -50,22 +50,28 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 1.5rem;
+            gap: 1rem;
             margin-bottom: 2rem;
+            flex-wrap: wrap;
         }
 
-        select {
+        .controls select {
             background: rgba(15, 23, 42, 0.8);
             border: 2px solid var(--accent-1);
             color: var(--text-main);
             font-family: 'Outfit', sans-serif;
-            font-size: 1.2rem;
-            padding: 0.8rem 2.5rem;
+            font-size: 1.1rem;
+            padding: 0.8rem 2rem;
             border-radius: 9999px;
             outline: none;
             cursor: pointer;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+        }
+
+        .controls select:hover {
+            border-color: var(--accent-2);
+            background: rgba(15, 23, 42, 1);
         }
 
         .info-panel {
@@ -220,6 +226,11 @@
             <option value="31">VALLE (31)</option>
             <option value="68">VAUPES (68)</option>
             <option value="72">VICHADA (72)</option>
+        </select>
+
+        <select id="source-select" onchange="fetchData()">
+            <option value="local">Preconteo (JSON Local)</option>
+            <option value="ch">Escrutinio (ClickHouse)</option>
         </select>
     </div>
 
@@ -402,38 +413,75 @@ function formatNum(num) { return Math.floor(num).toLocaleString('es-CO'); }
 
 async function fetchData() {
     const deptoCode = document.getElementById('depto-select').value;
-    // Ahora apuntamos a la carpeta local donde descargamos los datos
-    const url = `api_data/${deptoCode}00.json`;
+    const source = document.getElementById('source-select').value;
     
-    document.getElementById('content').innerHTML = '<div class="loading">Cargando datos locales...</div>';
+    document.getElementById('content').innerHTML = '<div class="loading">Cargando datos...</div>';
     
     try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Archivo no encontrado');
-        const data = await response.json();
-        
-        // Votos en Blanco
-        const blankVotes = data.camaras && data.camaras[0] ? parseInt(data.camaras[0].totales.act.votbla || 0) : 0;
+        let parties = [];
+        let blankVotes = 0;
+
+        if (source === 'local') {
+            const url = `api_data/${deptoCode}00.json`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Archivo no encontrado');
+            const data = await response.json();
+            
+            blankVotes = data.camaras && data.camaras[0] ? parseInt(data.camaras[0].totales.act.votbla || 0) : 0;
+            const camara = data.camaras[0];
+            parties = camara.partotabla.map(p => {
+                const id = p.act.codpar;
+                const name = partyNames[id] || p.act.nompar || "---";
+                return {
+                    id: id, 
+                    name: `[${id}] ${name}`,
+                    votes: parseInt(p.act.vot)
+                };
+            });
+        } else {
+            // Fuente ClickHouse (Escrutinio)
+            const chUrl = 'http://66.94.100.48:8123/';
+            const query = `
+                SELECT 
+                    cod_partido, 
+                    any(nombre_partido) as name, 
+                    sum(votos_proyectados) as votes 
+                FROM supert.votos_partido_nacional 
+                WHERE cod_departamento = '${deptoCode}' AND corporacion = 'CAM' 
+                GROUP BY cod_partido 
+                ORDER BY votes DESC 
+                FORMAT JSON`;
+            
+            const response = await fetch(chUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Basic ' + btoa('admin:QaJZh6UUhTTNZAYB')
+                },
+                body: query
+            });
+
+            if (!response.ok) throw new Error('Error en ClickHouse');
+            const result = await response.json();
+            
+            parties = result.data.map(p => {
+                const id = parseInt(p.cod_partido).toString(); // Normalizar ID
+                const name = partyNames[id] || p.name || "---";
+                return {
+                    id: id,
+                    name: `[${id}] ${name}`,
+                    votes: parseInt(p.votes)
+                };
+            });
+            blankVotes = 0; // Mesa de escrutinio no suele tener el dato de blanco separado en esta tabla
+        }
+
         document.getElementById('votos-blancos').innerText = formatNum(blankVotes);
-
-        // El API para departamentos específicos suele traer los datos en camaras[0]
-        const camara = data.camaras[0];
-        const partiesRaw = camara.partotabla;
-        
-        // Mostrar [ID] Nombre del partido usando el mapeo cargado
-        const parties = partiesRaw.map(p => {
-            const id = p.act.codpar;
-            const name = partyNames[id] || p.act.nompar || "---";
-            return {
-                id: id, 
-                name: `[${id}] ${name}`,
-                votes: parseInt(p.act.vot)
-            };
-        }).sort((a,b) => b.votes - a.votes); // Mostrar todos los partidos
-
+        parties.sort((a,b) => b.votes - a.votes);
         calculateDhont(parties, deptoCode);
+
     } catch (e) {
-        document.getElementById('content').innerHTML = `<div class="loading" style="color:#ef4444">Error cargando datos del API. Puede ser por CORS o conexión.</div>`;
+        console.error(e);
+        document.getElementById('content').innerHTML = `<div class="loading" style="color:#ef4444">Error cargando datos. Verifique conexión a ClickHouse o archivos locales.</div>`;
     }
 }
 
